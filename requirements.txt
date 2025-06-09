@@ -1,0 +1,6 @@
+flask==2.3.3
+pyttsx3==2.90
+Werkzeug==2.3.7
+gtts==2.4.0
+pygame==2.5.2
+google-cloud-texttospeech==2.16.3

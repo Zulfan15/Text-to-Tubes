@@ -1,0 +1,38 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Development files
+*_backup.py
+*_test.py
+*_old.py
+check_*.py
+test_*.py
+
+# Audio files (opsional - uncomment jika tidak ingin audio files di-commit)
+# audio_files/*.mp3
+# audio_files/*.wav
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp

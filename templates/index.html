@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech - Konverter Teks ke Suara</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+            <div class="col-12">
+                <div class="card shadow-lg border-0 mx-auto" style="max-width: 800px; margin-top: 50px;">
+                    <div class="card-header bg-primary text-white text-center py-4">
+                        <h1 class="mb-0">
+                            <i class="fas fa-volume-up me-3"></i>
+                            Text to Speech Indonesia
+                        </h1>
+                        <p class="mb-0 mt-2">Konversi teks menjadi suara dengan mudah</p>
+                    </div>                      <div class="card-body p-5">
+                        <form id="ttsForm">
+                            <!-- Input Teks -->
+                            <div class="mb-4">
+                                <label for="textInput" class="form-label fw-bold">
+                                    <i class="fas fa-edit me-2"></i>Masukkan Teks
+                                </label>                                <textarea 
+                                    class="form-control" 
+                                    id="textInput" 
+                                    rows="5" 
+                                    placeholder="Ketikkan teks yang ingin diubah menjadi suara..."
+                                    required
+                                ></textarea>
+                                <div class="form-text d-flex justify-content-between">
+                                    <span>Maksimal 500 karakter</span>
+                                    <span id="charCount" class="text-muted">0/500</span>
+                                </div>
+                            </div>
+
+                            <!-- Pengaturan Kecepatan -->
+                            <div class="mb-4">
+                                <label for="speedSelect" class="form-label fw-bold">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Kecepatan Berbicara
+                                </label>
+                                <select class="form-select" id="speedSelect">
+                                    <option value="slow">Lambat</option>
+                                    <option value="normal" selected>Normal</option>
+                                    <option value="fast">Cepat</option>
+                                </select>
+                            </div>                            <!-- Format Output -->
+                            <div class="mb-4">
+                                <label for="formatSelect" class="form-label fw-bold">
+                                    <i class="fas fa-file-audio me-2"></i>Format Audio
+                                </label>
+                                <select class="form-select" id="formatSelect">
+                                    <option value="mp3" selected>MP3</option>
+                                    <option value="wav">WAV</option>
+                                </select>
+                            </div>                            <!-- Engine TTS -->
+                            <div class="mb-4">
+                                <label for="engineSelect" class="form-label fw-bold">
+                                    <i class="fas fa-cog me-2"></i>Engine Text-to-Speech
+                                </label>                                <select class="form-select" id="engineSelect">
+                                    <option value="auto" selected>🎯 AUTO (Pilih Terbaik)</option>
+                                    <option value="gtts">🌐 Google TTS Enhanced (Bahasa Indonesia)</option>
+                                    <option value="pyttsx3">🖥️ Windows TTS (Multi-Gender)</option>
+                                </select>
+                                <div class="form-text" id="engineHelp">Mode AUTO akan memilih engine terbaik berdasarkan gender. Google TTS Enhanced menggunakan Cloud TTS untuk gender selection yang lebih baik.</div>
+                            </div>
+
+                            <!-- Gender Suara -->
+                            <div class="mb-4">
+                                <label for="genderSelect" class="form-label fw-bold">
+                                    <i class="fas fa-user me-2"></i>Gender Suara
+                                </label>
+                                <select class="form-select" id="genderSelect">
+                                    <option value="male" selected>👨 Laki-laki</option>
+                                    <option value="female">👩 Perempuan</option>
+                                </select>
+                                <div class="form-text" id="genderHelp">Mode AUTO akan mengoptimalkan pemilihan engine untuk gender ini</div>
+                            </div>                            <!-- Progress Indicator -->
+                            <div id="progressArea" class="mb-4 d-none">
+                                <div class="card border-info">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-cogs me-2"></i>
+                                            <span id="progressTitle">Memproses...</span>
+                                        </h6>
+                                        <div class="progress mb-2" style="height: 20px;">
+                                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                                 id="progressBar" role="progressbar" style="width: 0%">
+                                                <span id="progressPercent">0%</span>
+                                            </div>
+                                        </div>
+                                        <small class="text-muted" id="progressStatus">Menginisialisasi...</small>
+                                    </div>
+                                </div>
+                            </div>                            <!-- Tombol Konversi -->
+                            <div class="d-grid gap-2 mb-4">
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">                                        <button type="button" class="btn btn-outline-primary w-100" id="previewBtn">
+                                            <i class="fas fa-eye me-2"></i>Preview (50 karakter)
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <button type="submit" class="btn btn-primary w-100" id="convertBtn">
+                                            <i class="fas fa-magic me-2"></i>
+                                            <span id="btnText">Konversi ke Suara</span>
+                                            <div class="spinner-border spinner-border-sm ms-2 d-none" id="loadingSpinner"></div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>                        </form>
+
+                        <!-- Area Hasil -->
+                        <div id="resultArea" class="d-none">
+                            <div class="alert alert-success" role="alert">
+                                <h5 class="alert-heading">
+                                    <i class="fas fa-check-circle me-2"></i>Konversi Berhasil!
+                                </h5>
+                                <p class="mb-3">Audio telah berhasil dibuat. Anda dapat memutar atau mengunduh file audio di bawah ini.</p>
+                                
+                                <!-- Voice Info -->
+                                <div class="mb-3">
+                                    <span class="badge bg-primary" id="voiceInfo">Engine Info</span>
+                                </div>
+                                
+                                <!-- Audio Player -->
+                                <div class="mb-3">
+                                    <audio id="audioPlayer" controls class="w-100">
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                </div>
+                                
+                                <!-- Tombol Download -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a id="downloadBtn" href="#" class="btn btn-outline-success">
+                                        <i class="fas fa-download me-2"></i>Download Audio
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- History Section -->
+                        <div id="historySection" class="mt-4 d-none">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-history me-2"></i>Riwayat Konversi
+                                    </h5>
+                                    <button class="btn btn-outline-danger btn-sm" id="clearHistoryBtn">
+                                        <i class="fas fa-trash me-1"></i>Hapus Semua
+                                    </button>
+                                </div>
+                                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                    <div id="historyList">
+                                        <!-- History items will be added here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alert Error -->
+                        <div id="errorArea" class="alert alert-danger d-none" role="alert">
+                            <h5 class="alert-heading">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Terjadi Kesalahan
+                            </h5>
+                            <p id="errorMessage" class="mb-0"></p>
+                        </div>
+                    </div>
+
+                    <div class="card-footer text-center text-muted">
+                        <small>
+                            <i class="fas fa-info-circle me-1"></i>
+                            Gunakan teks dalam Bahasa Indonesia untuk hasil terbaik
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
