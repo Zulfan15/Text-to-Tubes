@@ -312,9 +312,9 @@ document.addEventListener('DOMContentLoaded', function() {    // Form Elements
         
         if (selectedEngine === 'auto') {
             if (selectedGender === 'male') {
-                genderHelp.textContent = '👨 Mode AUTO akan prioritaskan Windows TTS untuk suara laki-laki';
+                genderHelp.textContent = 'Mode AUTO akan prioritaskan Windows TTS untuk suara laki-laki';
             } else {
-                genderHelp.textContent = '👩 Mode AUTO akan prioritaskan Google TTS untuk suara perempuan';
+                genderHelp.textContent = 'Mode AUTO akan prioritaskan Google TTS untuk suara perempuan';
             }
         }
     });    // Helper functions for UI state management

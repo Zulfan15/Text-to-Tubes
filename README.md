@@ -1,0 +1,1 @@
+jalankan app.py
